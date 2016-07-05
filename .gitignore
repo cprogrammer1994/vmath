@@ -1,0 +1,11 @@
+__pycache__
+
+Bin
+Temp
+
+build
+dist
+
+files.txt
+vmath.egg-info
+MANIFEST
