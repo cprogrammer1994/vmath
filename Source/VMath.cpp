@@ -141,7 +141,28 @@ static PyMethodDef methods[] = {
 	{0, 0, 0, 0},
 };
 
+bool ModuleReady() {
+	if (PyType_Ready(&MatrixType) < 0) {
+		return false;
+	}
+
+	if (PyType_Ready(&VectorType) < 0) {
+		return false;
+	}
+
+	return true;
+}
+
 PyObject * InitModule(PyObject * module) {
+	if (!module) {
+		return module;
+	}
+
+	Py_INCREF(&MatrixType);
+	Py_INCREF(&VectorType);
+
+	PyModule_AddObject(module, "Matrix", (PyObject *)&MatrixType);
+	PyModule_AddObject(module, "Vector", (PyObject *)&VectorType);
 	return module;
 }
 
@@ -154,6 +175,10 @@ extern "C" {
 }
 
 PyObject * PyInit_vmath() {
+	if (!ModuleReady()) {
+		PyErr_SetString(PyExc_ImportError, "cannot import module");
+		return 0;
+	}
 	PyObject * module = PyModule_Create(&moduledef);
 	return InitModule(module);
 }
@@ -165,6 +190,10 @@ extern "C" {
 }
 
 PyObject * initvmath() {
+	if (!ModuleReady()) {
+		PyErr_SetString(PyExc_ImportError, "cannot import module");
+		return 0;
+	}
 	PyObject * module = Py_InitModule("vmath", methods);
 	return InitModule(module);
 }
